@@ -285,8 +285,8 @@ RUN set -eux \
 	# Type:         GIT extension
 	&& git clone https://github.com/php-memcached-dev/php-memcached /tmp/memcached \
 	&& cd /tmp/memcached \
-	# Custom:       Branch
-	&& git checkout master \
+	# Custom:       Tag
+	&& git checkout v3.2.0 \
 	# Custom:       Install command
 	&& true \
 # FIXME: This is a work-around to mitigate compile error with PHP 8.2
