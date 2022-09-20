@@ -264,7 +264,7 @@ fi \
  \
 	\
 # -------------------- wkhtmltopdf --------------------
-	&& VERSION="$( curl -sSL -L --fail https://github.com/wkhtmltopdf/wkhtmltopdf/releases | grep -Eo '/wkhtmltopdf/.+jessie_amd64\.deb' | head -1 )" \
+	&& VERSION="$( curl -sSL -L --fail https://api.github.com/repos/wkhtmltopdf/wkhtmltopdf/releases | grep -o '"browser_download_url": *"[^"]*"' | grep -o '"[^"]*"$' | grep -o '.*wkhtmltox.*jessie_amd64\.deb.*' | sed 's/"//g' | sed 's/https\:\/\/github\.com\///' | head -1 )" \
 	&& if [ "$(dpkg-architecture --query DEB_HOST_ARCH)" = "amd64" ]; then \
   DEBIAN_FRONTEND=noninteractive apt-get update -qq \
   && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --no-install-recommends --no-install-suggests \
