@@ -180,8 +180,8 @@ RUN set -eux \
 \
 && chown -R devilbox:devilbox "/opt/nvm" \
  \
-	&& su  -c '. /opt/nvm/nvm.sh; nvm install --lts' devilbox \
-&& su  -c '. /opt/nvm/nvm.sh; nvm use --lts' devilbox \
+	&& su  -c '. /opt/nvm/nvm.sh; nvm install 16' devilbox \
+&& su  -c '. /opt/nvm/nvm.sh; nvm use 16' devilbox \
 && su  -c '. /opt/nvm/nvm.sh; corepack enable' devilbox \
 \
 && chmod 0777 /opt/nvm \
