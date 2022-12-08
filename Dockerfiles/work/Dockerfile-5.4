@@ -1,5 +1,5 @@
-# Auto-generated via Ansible: edit build/ansible/DOCKERFILES/Dockerfile-work.j2 instead.
 FROM max4com/php-fpm:5.4-prod
+# Auto-generated via Ansible: edit ./ansible/DOCKERFILES/Dockerfile-work.j2 instead.
 MAINTAINER "cytopia" <cytopia@everythingcli.org>
 
 ARG ARCH
@@ -160,6 +160,8 @@ RUN set -eux \
  \
 	\
 # -------------------- nvm --------------------
+	&& NODE_VERSION="17" \
+ \
 	&& NVM_VERSION="$( \
   curl -sS 'https://github.com/nvm-sh/nvm/releases' \
   | grep -Eo '/nvm-sh/nvm/releases/tag/v?[.0-9]+"' \
@@ -168,8 +170,7 @@ RUN set -eux \
   | tail -1 \
 )" \
 && mkdir -p /opt/nvm \
- \
-	&& curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh" \
+&& curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh" \
   | NVM_DIR="/opt/nvm" bash \
 \
 && { \
@@ -180,9 +181,9 @@ RUN set -eux \
 \
 && chown -R devilbox:devilbox "/opt/nvm" \
  \
-	&& su  -c '. /opt/nvm/nvm.sh; nvm install 16' devilbox \
-&& su  -c '. /opt/nvm/nvm.sh; nvm use 16' devilbox \
-&& su  -c '. /opt/nvm/nvm.sh; corepack enable' devilbox \
+	&& su  -c ". /opt/nvm/nvm.sh; nvm install ${NODE_VERSION}" devilbox \
+&& su  -c ". /opt/nvm/nvm.sh; nvm use ${NODE_VERSION}" devilbox \
+&& su  -c ". /opt/nvm/nvm.sh; corepack enable" devilbox \
 \
 && chmod 0777 /opt/nvm \
 && find /opt/nvm -type f -print0 | xargs -n1 -0 chmod go+w \
@@ -347,18 +348,19 @@ fi \
  \
 	\
 # -------------------- symfony --------------------
-	&& SYMFONY_VERSION="$( curl -sS -L --fail https://api.github.com/repos/symfony-cli/symfony-cli/releases/latest | jq -r '.tag_name' | cut -c 2- )" \
-	&& curl -sS -L --fail -o /tmp/symfony-cli.tar.gz "https://github.com/symfony-cli/symfony-cli/releases/download/v${SYMFONY_VERSION}/symfony-cli_linux_$(dpkg-architecture --query DEB_HOST_ARCH).tar.gz" \
-	&& tar -zxvf /tmp/symfony-cli.tar.gz symfony -O > /usr/local/bin/symfony \
-	&& chmod +x /usr/local/bin/symfony \
+	&& VERSION="$(curl -s https://api.github.com/repos/symfony-cli/symfony-cli/releases/latest | awk -F\" '/symfony-cli_.*._amd64\.deb/{print $(NF-1)}' | head -1 | sed 's/^.*[^0-9]\([0-9]*\.[0-9]*\.[0-9]*\).*$/\1/')" \
+	&& curl -sS -L --fail -o /tmp/symfonycli.deb  https://github.com/symfony-cli/symfony-cli/releases/download/v${VERSION}/symfony-cli_${VERSION}_$(dpkg-architecture --query DEB_HOST_ARCH).deb \
+&& dpkg -i /tmp/symfonycli.deb \
+&& rm -f /tmp/symfonycli.deb \
+ \
 	\
 # -------------------- wkhtmltopdf --------------------
-	&& VERSION="$( curl -sSL -L --fail https://api.github.com/repos/wkhtmltopdf/wkhtmltopdf/releases | grep -o '"browser_download_url": *"[^"]*"' | grep -o '"[^"]*"$' | grep -o '.*wkhtmltox.*jessie_amd64\.deb.*' | sed 's/"//g' | sed 's/https\:\/\/github\.com\///' | head -1 )" \
+	&& VERSION="$(curl -sSL -L --fail https://api.github.com/repos/wkhtmltopdf/wkhtmltopdf/releases | awk -F\" '/wkhtmltopdf.*.jessie_amd64\.deb/{print $(NF-1)}' | head -1 )" \
 	&& if [ "$(dpkg-architecture --query DEB_HOST_ARCH)" = "amd64" ]; then \
   DEBIAN_FRONTEND=noninteractive apt-get update -qq \
   && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --no-install-recommends --no-install-suggests \
     libfontenc1 libxfont1 xfonts-75dpi xfonts-base xfonts-encodings xfonts-utils \
-  && curl -sS -L --fail -o /tmp/wkhtmltopdf.deb  https://github.com/${VERSION} \
+  && curl -sS -L --fail -o /tmp/wkhtmltopdf.deb  ${VERSION} \
   && dpkg -i /tmp/wkhtmltopdf.deb \
   && rm -f /tmp/wkhtmltopdf.deb; \
 fi \
@@ -756,7 +758,7 @@ fi \
 	&& php-cs-fixer --version 2>&1 | grep -E 'Fixer\s+(version\s*)?[-_.0-9]+\s+' \
 	&& phpmd --version | grep -E '^PHPMD [0-9][.0-9]+' \
 	&& phpunit --version | grep -iE '^PHPUnit\s[0-9][.0-9]+' \
-	&& symfony -V | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" | grep -E 'version [0-9][.0-9]+' \
+	&& symfony -V | grep -Ei 'version\s[0-9][.0-9]+' \
 	&& if [ "$(dpkg-architecture --query DEB_HOST_ARCH)" = "amd64" ]; then wkhtmltopdf --version | grep -E "^wkhtmltopdf [0-9][.0-9]+\s+\(.+patched.+\)"; fi \
 	&& wp --allow-root --version | grep -E '[0-9][.0-9]+' \
 	\

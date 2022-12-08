@@ -1,5 +1,5 @@
-# Auto-generated via Ansible: edit build/ansible/DOCKERFILES/Dockerfile-base.j2 instead.
 FROM php:8.0-fpm
+# Auto-generated via Ansible: edit ./ansible/DOCKERFILES/Dockerfile-base.j2 instead.
 MAINTAINER "cytopia" <cytopia@everythingcli.org>
 
 

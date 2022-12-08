@@ -1,4 +1,4 @@
-# Auto-generated via Ansible: edit build/ansible/DOCKERFILES/Dockerfile-base.j2 instead.
+# Auto-generated via Ansible: edit ./ansible/DOCKERFILES/Dockerfile-base.j2 instead.
 FROM devilbox/php-fpm-5.4
 MAINTAINER "cytopia" <cytopia@everythingcli.org>
 
@@ -38,21 +38,6 @@ ENV MY_USER="devilbox" \
 RUN set -eux \
 	&& groupadd -g ${MY_GID} -r ${MY_GROUP} \
 	&& useradd -u ${MY_UID} -m -s /bin/bash -g ${MY_GROUP} ${MY_USER}
-
-
-###
-### Certificate Fix
-###
-RUN set -eux \
-	&& sed -i -e 's|mozilla/DST_Root_CA_X3.crt|#mozilla/DST_Root_CA_X3.crt|g' /etc/ca-certificates.conf \
-	&& sed -i -e 's|mozilla/ISRG_Root_X1.crt|#mozilla/ISRG_Root_X1.crt|g' /etc/ca-certificates.conf \
-	&& curl -sS -k -L --fail https://letsencrypt.org/certs/lets-encrypt-r3.pem > /usr/local/share/ca-certificates/lets-encrypt-r3.pem \
-	&& curl -sS -k -L --fail https://letsencrypt.org/certs/isrgrootx1.pem > /usr/local/share/ca-certificates/isrgrootx1.pem \
-	&& cd /usr/local/share/ca-certificates/ \
-	&& ln -s isrgrootx1.pem isrgrootx1.crt \
-	&& ln -s lets-encrypt-r3.pem lets-encrypt-r3.crt \
-	&& cd - \
-	&& update-ca-certificates -f
 
 
 ###
