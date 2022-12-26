@@ -1,5 +1,6 @@
-FROM max4com/php-fpm:7.3-base as builder
+# vi: ft=dockerfile
 # Auto-generated via Ansible: edit ./ansible/DOCKERFILES/Dockerfile-mods.j2 instead.
+FROM max4com/php-fpm:7.3-base as builder
 
 
 ###
@@ -891,7 +892,7 @@ RUN set -eux \
 
 # Fix php.ini settings for enabled extensions
 RUN set -eux \
-	&& chmod +x "$(php -r 'echo ini_get("extension_dir");')"/*
+	&& find "$(php -r 'echo ini_get("extension_dir");')/" -type f -exec chmod +x {} \;
 
 # Fix oracle dir for images that don't have oci installed
 RUN set -eux \
@@ -905,8 +906,8 @@ RUN set -eux \
 
 
 
-FROM max4com/php-fpm:7.3-base as final
 # Auto-generated via Ansible: edit ./ansible/DOCKERFILES/Dockerfile-mods.j2 instead.
+FROM max4com/php-fpm:7.3-base as final
 MAINTAINER "cytopia" <cytopia@everythingcli.org>
 
 ###
